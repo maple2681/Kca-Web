@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin sign in | Kyiv Christian Academy</title>
+<link rel="icon" href="../assets/crest.png">
+<style>
+@font-face { font-family: "Satoshi"; src: url("../assets/fonts/Satoshi-Medium.woff") format("woff"); font-weight: 400 500; }
+@font-face { font-family: "Satoshi"; src: url("../assets/fonts/Satoshi-Bold.otf") format("opentype"); font-weight: 700; }
+@font-face { font-family: "Panchang"; src: url("../assets/fonts/Panchang-Semibold.otf") format("opentype"); font-weight: 600; }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; font-family: "Satoshi", system-ui, sans-serif; font-weight: 500; color: #111a26;
+  background: linear-gradient(90deg, #4a8bc1 0%, #2680e0 50%, #0175fe 100%); }
+.card { width: min(420px, 100%); background: #f9f8f4; border-radius: 24px; padding: 32px 28px 28px; box-shadow: 0 30px 70px rgba(10, 37, 82, .3); }
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.brand img { width: 44px; }
+.brand b { font-family: "Panchang", sans-serif; font-weight: 600; font-size: 15px; line-height: 1.3; }
+h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; }
+.sub { margin: 0 0 22px; color: #555; font-size: 15px; line-height: 1.5; }
+label { display: block; margin: 0 0 6px; font-size: 14px; font-weight: 700; }
+input { width: 100%; height: 50px; margin-bottom: 14px; border: 2px solid #dcdcd8; border-radius: 14px; padding: 0 16px; font: 500 16px "Satoshi", system-ui, sans-serif; background: #fff; outline: none; }
+input:focus { border-color: #0b74e8; box-shadow: 0 0 0 4px rgba(11, 116, 232, .12); }
+button.main { width: 100%; height: 50px; margin-top: 4px; border: 0; border-radius: 99px; background: #111; color: #fff; font: 700 16px "Satoshi", system-ui, sans-serif; cursor: pointer; }
+button.main:disabled { opacity: .55; cursor: default; }
+.links { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: 14px; }
+.links a { color: #0b74e8; text-decoration: none; cursor: pointer; } .links a:hover { text-decoration: underline; }
+.msg { display: none; margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.msg.show { display: block; } .msg.err { background: #fdecea; color: #8a1f14; } .msg.ok { background: #e7f6e1; color: #2f5e1f; }
+.hidden { display: none !important; }
+.back { display: block; margin-top: 18px; text-align: center; color: #666; font-size: 14px; text-decoration: none; }
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand"><img src="../assets/crest.png" alt=""><b>Kyiv Christian<br>Academy</b></div>
+
+  <div id="notConfigured" class="hidden">
+    <h1>Admin not set up yet</h1>
+    <p class="sub">Add your Supabase details to <b>assets/js/cms-config.js</b> (see ADMIN-SETUP.md), then reload this page.</p>
+  </div>
+
+  <div id="app" class="hidden">
+    <h1 id="title">Admin sign in</h1>
+    <p class="sub" id="subtitle">Sign in with your @kca.org.ua school email to edit the website.</p>
+    <p class="msg" id="msg" role="alert"></p>
+
+    <form id="form" novalidate>
+      <div id="emailBox"><label for="email">School email</label><input id="email" type="email" autocomplete="username" placeholder="name@kca.org.ua" required></div>
+      <div id="passBox"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" minlength="8" required></div>
+      <div id="pass2Box" class="hidden"><label for="password2">Repeat password</label><input id="password2" type="password" autocomplete="new-password" minlength="8"></div>
+      <button class="main" type="submit" id="submit">Sign in</button>
+    </form>
+
+    <div id="signedIn" class="hidden">
+      <button class="main" type="button" id="openEditor">Open the website in edit mode</button>
+      <div class="links"><span></span><a id="signOut">Sign out</a></div>
+    </div>
+
+    <div class="links" id="links">
+      <a id="toSignup">Create an account</a>
+      <a id="toReset">Forgot password?</a>
+    </div>
+    <div class="links hidden" id="backLinks"><a id="toLogin">← Back to sign in</a></div>
+  </div>
+  <a class="back" href="/">← Back to the website</a>
+</main>
+
+<script src="../assets/js/cms-config.js?v=1790274298"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(() => {
+  const CFG = window.KCA_CMS || {}, DOMAIN = (CFG.allowedDomain || 'kca.org.ua').toLowerCase();
+  const $ = id => document.getElementById(id);
+  if (!CFG.supabaseUrl || !CFG.supabaseAnonKey || !window.supabase) { $('notConfigured').classList.remove('hidden'); return; }
+  $('app').classList.remove('hidden');
+  const sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
+  const here = location.origin + location.pathname;
+  let mode = 'login';
+
+  const msg = (text, ok) => { const m = $('msg'); m.textContent = text || ''; m.className = 'msg' + (text ? ' show ' + (ok ? 'ok' : 'err') : ''); };
+  const okDomain = e => e.toLowerCase().trim().endsWith('@' + DOMAIN);
+  const busy = on => { $('submit').disabled = on; };
+
+  function setMode(m) {
+    mode = m; msg('');
+    const T = {
+      login:   ['Admin sign in', 'Sign in with your @' + DOMAIN + ' school email to edit the website.', 'Sign in'],
+      signup:  ['Create an account', 'Only @' + DOMAIN + ' emails that the Admin has approved can register. We’ll send a link to your inbox to confirm the address exists.', 'Create account'],
+      reset:   ['Reset your password', 'Enter your school email and we’ll send you a link to choose a new password.', 'Send reset link'],
+      newpass: ['Choose a new password', 'Enter a new password for your account.', 'Save new password']
+    }[m];
+    $('title').textContent = T[0]; $('subtitle').textContent = T[1]; $('submit').textContent = T[2];
+    $('form').classList.remove('hidden'); $('signedIn').classList.add('hidden');
+    $('emailBox').classList.toggle('hidden', m === 'newpass');
+    $('passBox').classList.toggle('hidden', m === 'reset');
+    $('pass2Box').classList.toggle('hidden', !(m === 'signup' || m === 'newpass'));
+    $('password').autocomplete = m === 'login' ? 'current-password' : 'new-password';
+    $('links').classList.toggle('hidden', m !== 'login');
+    $('backLinks').classList.toggle('hidden', m === 'login');
+  }
+  function showSignedIn(user) {
+    $('title').textContent = 'You’re signed in'; $('subtitle').textContent = user.email + (user.kcaRole ? ' · ' + (user.kcaRole === 'admin' ? 'Admin' : 'Editor') : '');
+    $('form').classList.add('hidden'); $('links').classList.add('hidden'); $('backLinks').classList.add('hidden');
+    $('signedIn').classList.remove('hidden'); msg('');
+  }
+  const goEdit = () => { sessionStorage.setItem('kca-edit', '1'); location.href = '/'; };
+  const friendly = e => {
+    const t = (e && (e.message || e.error_description)) || String(e);
+    if (/Database error saving new user|not on the Allowed Emails|not allowed/i.test(t)) return 'This email hasn’t been approved yet. Ask the website Admin to add it to Allowed Emails.';
+    if (/Hook|403/i.test(t)) return 'This email isn’t on the Allowed Emails list. Ask the website Admin for access.';
+    if (/Email not confirmed/i.test(t)) return 'Please confirm your email first. Check your inbox (and spam) for the link we sent.';
+    if (/Invalid login credentials/i.test(t)) return 'Wrong email or password.';
+    if (/rate limit|too many/i.test(t)) return 'Too many attempts. Please wait a few minutes and try again.';
+    return t;
+  };
+
+  async function valid(user) {
+    if (!user) return false;
+    if (!okDomain(user.email)) { await sb.auth.signOut(); msg('Only @' + DOMAIN + ' accounts can use the admin panel.'); return false; }
+    if (!user.email_confirmed_at) { await sb.auth.signOut(); msg('Please confirm your email first.'); return false; }
+    const { data: role, error } = await sb.rpc('kca_my_role');
+    if (error || !role) { await sb.auth.signOut(); sessionStorage.removeItem('kca-edit'); msg('This email isn’t on the Allowed Emails list. Ask the website Admin for access.'); return false; }
+    user.kcaRole = role;
+    return true;
+  }
+
+  $('toSignup').onclick = () => setMode('signup');
+  $('toReset').onclick = () => setMode('reset');
+  $('toLogin').onclick = () => setMode('login');
+  $('openEditor').onclick = goEdit;
+  $('signOut').onclick = async () => { sessionStorage.removeItem('kca-edit'); await sb.auth.signOut(); setMode('login'); };
+
+  $('form').addEventListener('submit', async e => {
+    e.preventDefault(); msg('');
+    const email = $('email').value.trim().toLowerCase(), pass = $('password').value, pass2 = $('password2').value;
+    if (mode !== 'newpass') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg('Please enter a valid email address.');
+      if (!okDomain(email)) return msg('Only @' + DOMAIN + ' email addresses can use the admin panel.');
+    }
+    if ((mode === 'signup' || mode === 'newpass') && pass.length < 8) return msg('Please use at least 8 characters for the password.');
+    if ((mode === 'signup' || mode === 'newpass') && pass !== pass2) return msg('The two passwords don’t match.');
+    busy(true);
+    try {
+      if (mode === 'login') {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+        if (error) throw error;
+        if (await valid(data.user)) goEdit();
+      } else if (mode === 'signup') {
+        const { data, error } = await sb.auth.signUp({ email, password: pass, options: { emailRedirectTo: here } });
+        if (error) throw error;
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { setMode('login'); msg('An account with this email already exists. Please sign in.'); }
+        else { setMode('login'); msg('Almost done! We sent a confirmation link to ' + email + '. Open it to activate your account, then sign in here.', true); }
+      } else if (mode === 'reset') {
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here });
+        if (error) throw error;
+        msg('If an account exists for ' + email + ', a reset link is on its way.', true);
+      } else if (mode === 'newpass') {
+        const { error } = await sb.auth.updateUser({ password: pass });
+        if (error) throw error;
+        const { data } = await sb.auth.getUser();
+        if (await valid(data.user)) { msg('Password updated.', true); showSignedIn(data.user); }
+      }
+    } catch (err) { msg(friendly(err)); }
+    finally { busy(false); }
+  });
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') setMode('newpass');
+  });
+  setMode('login');
+  (async () => {
+    const hash = location.hash;
+    if (/error_description=/.test(hash)) { const p = new URLSearchParams(hash.slice(1)); msg(p.get('error_description').replace(/\+/g, ' ')); history.replaceState(null, '', here); }
+    const { data } = await sb.auth.getUser();
+    if (mode === 'newpass') return;
+    if (data && data.user && await valid(data.user)) {
+      showSignedIn(data.user);
+      if (/type=signup|type=email/.test(hash)) msg('Your email is confirmed. Welcome!', true);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
