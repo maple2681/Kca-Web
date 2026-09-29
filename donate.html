@@ -19,6 +19,7 @@
 <!-- /share preview -->
 <link rel="icon" href="assets/crest.png">
 <link rel="stylesheet" href="assets/css/site.css?v=1790276272">
+<link rel="stylesheet" href="assets/css/pages.css?v=1790660000">
 </head>
 <body>
 <header class="hero-header">
@@ -58,14 +59,59 @@
   <div class="ph-inner">
     <div>
       <p class="crumbs rise" style="animation-delay:.25s"><a href="/">Home</a><span>/</span>Donate</p>
-      <h1 class="rise" style="animation-delay:.35s">Support KCA</h1>
-      <p class="lead-w rise" style="animation-delay:.45s">Your gift helps KCA keep partnering with missionary families through Christian education, and supports our ministry to Ukrainians who are rebuilding and healing from this war.</p>
+      <h1 class="rise" style="animation-delay:.35s">Make a Donation to KCA</h1>
+      <p class="lead-w rise" style="animation-delay:.45s">Join us today in securing KCA’s future of partnering with missionary families through Christian education and a supportive community.</p>
     </div>
-    <div class="ph-actions rise" style="animation-delay:.55s"><a class="btn btn-gold" href="#give">Give now <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a><a class="btn btn-light" href="#ways">Ways to give <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a></div>
+    <div class="ph-actions rise" style="animation-delay:.55s"><a class="btn btn-gold" href="#give">Give now <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a><a class="btn btn-light" href="#impact">Where your gift goes <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a></div>
   </div>
 </section>
 
-<section class="sec"><div class="wrap2">
+<section class="sec" id="give"><div class="wrap2">
+  <div class="split give-split">
+    <div class="reveal give-intro">
+      <span class="chip">Donate</span>
+      <h2 class="give-title">Make a Donation to KCA</h2>
+      <p>Join us today in securing KCA’s future of partnering with missionary families through Christian education and a supportive community. We believe the Lord is preserving the school through these difficult days.</p>
+      <p>The work and ministry to serve Ukrainians in rebuilding and healing from this war will be expansive. KCA will be there in the critical role alongside those families who are answering God’s call. Thank you for your donation to the work of KCA.</p>
+      <div class="bf-note"><b>KCA partners with Bright Fund Ukraine,</b> a 501(c)(3) tax exempt organization, EIN 86-1627924, that accepts donations on behalf of KCA and its ministries in Ukraine.</div>
+    </div>
+    <div class="form-card reveal give-card" id="giveCard">
+      <h3 class="give-q">How would you like to make your gift? <em>(Required)</em></h3>
+      <div class="give-methods" role="radiogroup" aria-label="How would you like to make your gift?">
+        <label class="gm"><input type="radio" name="give-method" value="online"><span class="gm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg></span><b>Secure Online Gift</b><small>Pay by card</small></label>
+        <label class="gm"><input type="radio" name="give-method" value="check"><span class="gm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg></span><b>Mail a Check</b><small>By post, USA</small></label>
+        <label class="gm"><input type="radio" name="give-method" value="wire"><span class="gm-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg></span><b>Wire Transfer</b><small>Bank to bank</small></label>
+      </div>
+      <p class="give-hint" id="giveHint">Choose a way to give to continue.</p>
+
+      <div class="give-panel" data-panel="online" hidden>
+        <h4>Amount of your gift (USD) <em>(Required)</em></h4>
+        <div class="amounts give-amounts"><button type="button" data-v="25">$25</button><button type="button" data-v="50" class="on">$50</button><button type="button" data-v="100">$100</button><button type="button" data-v="250">$250</button><button type="button" data-v="500">$500</button><button type="button" data-v="other">Other</button></div>
+        <div class="field give-other" hidden><label for="giveOther">Other amount (USD)</label><input id="giveOther" type="number" min="1" step="1" inputmode="decimal" placeholder="e.g. 75"></div>
+        <h4>Want to make your gift go farther?</h4>
+        <label class="fx-check"><input type="checkbox" id="giveFee"><span>Please increase my gift by 2.9 percent to cover transaction expenses.</span></label>
+        <div class="give-total"><span>Your gift</span><b id="giveTotal">$50.00</b></div>
+        <a class="btn btn-dark give-go" id="giveGo" href="https://kca.org.ua/make-a-donation-to-kca/" target="_blank" rel="noopener">Continue to secure payment <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a>
+        <p class="note">You’ll complete your card payment on KCA’s official, secure donation form.</p>
+      </div>
+
+      <div class="give-panel" data-panel="check" hidden>
+        <div class="give-check">
+          <p>Please make your check payable to <b><i>Bright Fund Ukraine</i></b></p>
+          <address><span>Mailing Address:</span>Bright Fund Ukraine<br>218 Heatherfield Drive<br>Souderton, PA 18964-1954</address>
+          <button type="button" class="btn btn-light give-copy" id="giveCopy">Copy address <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></button>
+        </div>
+      </div>
+
+      <div class="give-panel" data-panel="wire" hidden>
+        <p class="give-wire-note">Please fill out the rest of this form and our Finance Office will contact you with details about how to send your gift by wire transfer.</p>
+        <form class="fx-wire" id="wireForm" data-form data-subject="Donation — wire transfer request" novalidate><div class="form-grid"><fieldset class="field full fx-group"><legend>Name <i>*</i></legend><div class="fx-sub2"><div><input id="d-name-first" name="d-name-first" type="text" data-label="Name — first" autocomplete="given-name" required aria-label="First"><small>First</small></div><div><input id="d-name-last" name="d-name-last" type="text" data-label="Name — last" autocomplete="family-name" required aria-label="Last"><small>Last</small></div></div><span class="err">Please fill this in correctly.</span></fieldset><fieldset class="field full fx-group"><legend>Address <i>*</i></legend><div class="fx-sub2"><div class="full"><input name="d-addr-street" type="text" data-label="Street address" autocomplete="address-line1" required aria-label="Street Address"><small>Street Address</small></div><div class="full"><input name="d-addr-line2" type="text" data-label="Address line 2" autocomplete="address-line2" aria-label="Address Line 2"><small>Address Line 2</small></div><div><input name="d-addr-city" type="text" data-label="City" autocomplete="address-level2" required aria-label="City"><small>City</small></div><div><input name="d-addr-state" type="text" data-label="State / Province / Region" autocomplete="address-level1" placeholder="" aria-label="State / Province / Region"><small>State / Province / Region</small></div><div><input name="d-addr-zip" type="text" data-label="ZIP / Postal code" autocomplete="postal-code" aria-label="ZIP / Postal Code"><small>ZIP / Postal Code</small></div><div><select name="d-addr-country" data-label="Country" autocomplete="country-name" aria-label="Country" required><option value="">Choose…</option><option>Ukraine</option><option>United States</option><option>Canada</option><option>United Kingdom</option><option>South Korea</option><option>Germany</option><option>Netherlands</option><option>Poland</option><option>Moldova</option><option>Romania</option><option>Australia</option><option>New Zealand</option><option>South Africa</option><option>Brazil</option><option>Other</option></select><small>Country</small></div></div><span class="err">Please fill this in correctly.</span></fieldset><div class="field"><label for="d-email">Email <i>*</i></label><input id="d-email" name="d-email" type="email" data-label="Email" placeholder="" required><span class="err">Please fill this in correctly.</span></div><div class="field"><label for="d-phone">Phone <i>*</i></label><input id="d-phone" name="d-phone" type="tel" data-label="Phone" placeholder="" required><span class="err">Please fill this in correctly.</span></div><div class="field full"><label for="d-amount">Amount of your gift (USD)</label><input id="d-amount" name="d-amount" type="number" data-label="Amount of your gift (USD)" placeholder="e.g. 100" min="1" step="1" inputmode="decimal"><span class="err">Please fill this in correctly.</span></div><div class="field full"><label for="d-msg">Would you like to send a message with your gift?</label><textarea id="d-msg" name="d-msg" data-label="Would you like to send a message with your gift?" placeholder=""></textarea><span class="err">Please fill this in correctly.</span></div></div><div class="form-foot"><small>Our Finance Office will reply by email with wire transfer details.</small><button type="submit" class="btn btn-dark">Request wire details <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></button></div><p class="form-ok" role="status">Thank you! Our Finance Office will contact you with wire transfer details soon.</p><p class="form-fail" role="alert">Sorry, something went wrong. Please try again, or email us at <a href="mailto:office@kca.org.ua"><b>office@kca.org.ua</b></a>.</p></form>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="impact"><div class="wrap2">
   <div class="sec-head"><span class="chip">Your impact</span><h2 class="reveal">Where your gift goes</h2></div>
   <div class="grid g3 stagger reveal">
     <article class="card c-blue"><h3>Missionary families</h3><p>Help missionary parents keep serving in Ukraine while their children receive a quality education.</p></article>
@@ -73,36 +119,7 @@
     <article class="card c-lav"><h3>Healing &amp; rebuilding</h3><p>Stand with Ukrainian families as they rebuild and heal from the war.</p></article>
   </div>
 </div></section>
-
-<section class="sec" id="give"><div class="wrap2">
-  <div class="split">
-    <div class="form-card reveal">
-      <h3 style="margin:0 0 6px;font-family:var(--display);font-weight:600;font-size:clamp(22px,2vw,30px)">Choose your gift</h3>
-      <p style="margin:0;color:#555">Donations are processed securely on KCA’s official giving page.</p>
-      <div style="margin-top:18px" class="freq"><button type="button" class="on" data-f="one-time">One-time</button><button type="button" data-f="monthly">Monthly</button></div>
-      <div class="amounts"><button type="button">$25</button><button type="button" class="on">$50</button><button type="button">$100</button><button type="button">$250</button><button type="button">$500</button><button type="button">Other</button></div>
-      <p style="margin:0 0 18px;font-size:15px;color:#444">Your <b id="giveFreq">one-time</b> gift: <b id="giveAmount">$50</b></p>
-      <a class="btn btn-dark" href="https://kca.org.ua/make-a-donation-to-kca/" target="_blank" rel="noopener">Continue to secure giving <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a>
-      <p class="note">You’ll finish on kca.org.ua, where you can also choose to add 2.9% to cover processing fees.</p>
-    </div>
-    <div class="reveal">
-      <h3>Tax-deductible giving from the U.S.</h3>
-      <p>KCA partners with <b>Bright Fund Ukraine</b>, a 501(c)(3) tax-exempt organization (EIN 86-1627924) that accepts donations on behalf of KCA.</p>
-      <ul class="checks"><li>Secure online gift through the official donation form</li><li>Check payable to Bright Fund Ukraine</li><li>Wire transfer (the Finance Office will send details)</li></ul>
-      <p class="note">Questions about giving? Email <a href="mailto:office@kca.org.ua"><b>office@kca.org.ua</b></a>.</p>
-    </div>
-  </div>
-</div></section>
-
-<section class="sec" id="ways"><div class="wrap2">
-  <div class="sec-head"><span class="chip">Ways to give</span><h2 class="reveal">Other ways to give</h2></div>
-  <div class="grid g3 stagger reveal">
-    <article class="card c-lime"><span class="num">ONLINE</span><h3>Secure online gift</h3><p>Give by card through KCA’s official donation form.</p><a class="more" href="https://kca.org.ua/make-a-donation-to-kca/" target="_blank" rel="noopener">Give online <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a></article>
-    <article class="card"><span class="num">BY MAIL</span><h3>Mail a check</h3><p>Make checks payable to <b>Bright Fund Ukraine</b> and mail to:<br>218 Heatherfield Drive,<br>Souderton, PA 18964-1954, USA</p></article>
-    <article class="card c-salmon"><span class="num">WIRE</span><h3>Wire transfer</h3><p>Complete the donation form and KCA’s Finance Office will contact you with wire details.</p><a class="more" href="https://kca.org.ua/make-a-donation-to-kca/" target="_blank" rel="noopener">Request details <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a></article>
-  </div>
-</div></section>
-<section class="sec last"><div class="wrap2"><div class="cta-band reveal"><div><h2>Thank you for standing with KCA</h2><p>Every gift helps a child learn and grow in faith.</p></div><div class="ph-actions"><a class="btn btn-gold" href="https://kca.org.ua/make-a-donation-to-kca/" target="_blank" rel="noopener">Give now <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a><a class="btn btn-light" href="/contact">Contact us <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a></div></div></div></section>
+<section class="sec last"><div class="wrap2"><div class="cta-band reveal"><div><h2>Thank you for standing with KCA</h2><p>Every gift helps a child learn and grow in faith.</p></div><div class="ph-actions"><a class="btn btn-gold" href="#give">Give now <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a><a class="btn btn-light" href="/contact">Contact us <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 5-5 5"/></svg></i></a></div></div></div></section>
 <footer class="footer" id="footer">
   <div class="ft-brand">
     <img src="assets/crest.png" alt="Kyiv Christian Academy crest">
@@ -152,5 +169,6 @@
 <script src="assets/js/cms-config.js?v=1790276272"></script>
 <script src="assets/js/cms.js?v=1790276272"></script>
 <script src="assets/js/site.js?v=1790276272"></script>
+<script src="assets/js/pages.js?v=1790660000"></script>
 </body>
 </html>
