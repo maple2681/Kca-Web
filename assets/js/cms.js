@@ -9,7 +9,7 @@
   const CFG = window.KCA_CMS || {};
   const TEST = window.KCA_CMS_TEST || null;             // used only by automated tests
   const configured = !!(TEST || (CFG.supabaseUrl && CFG.supabaseAnonKey));
-  const PAGES = ['index.html', 'about.html', 'academics.html', 'admissions.html', 'student-life.html', 'reviews.html', 'teaching.html', 'donate.html', 'contact.html', 'team.html'];
+  const PAGES = ['index.html', 'about.html', 'academics.html', 'admissions.html', 'student-life.html', 'reviews.html', 'teaching.html', 'donate.html', 'contact.html', 'team.html', 'teacher-application.html'];
   const page = (() => { let p = decodeURIComponent(location.pathname.replace(/\/+$/, '').split('/').pop() || 'index'); if (!/\.html$/.test(p)) p += '.html'; return p; })();
   const urlOf = p => (p === 'index.html' ? '/' : '/' + p.replace(/\.html$/, ''));
   const SKIP = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'OPTION', 'SELECT', 'TEXTAREA', 'TITLE', 'VIDEO', 'IFRAME']);
