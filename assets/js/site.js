@@ -199,10 +199,25 @@ async function sendForm(data) {
     const btn = f.querySelector('button[type=submit]'), okEl = f.querySelector('.form-ok'), failEl = f.querySelector('.form-fail');
     f.addEventListener('submit', async e => {
       e.preventDefault(); let ok = true;
-      f.querySelectorAll('.field').forEach(fl => { const c = fl.querySelector('input,select,textarea'); const bad = c && !c.checkValidity(); fl.classList.toggle('bad', bad); if (bad && ok) { c.focus(); ok = false; } });
+      f.querySelectorAll('.field').forEach(fl => {
+        if (fl.closest('[hidden]')) { fl.classList.remove('bad'); return; }
+        const cs = [...fl.querySelectorAll('input,select,textarea')].filter(c => !c.disabled && c.type !== 'hidden');
+        const bad = fl.matches('[data-choice]') ? (fl.hasAttribute('data-required') || cs.some(c => c.required)) && !cs.some(c => c.checked) : cs.some(c => !c.checkValidity());
+        fl.classList.toggle('bad', bad); if (bad && ok) { (cs.find(c => !c.checkValidity()) || cs[0])?.focus(); ok = false; }
+      });
       if (!ok) return;
       const data = { _subject: 'KCA website: ' + (f.dataset.subject || 'Message'), _template: 'table', _captcha: 'false', 'Form': f.dataset.subject || '', 'Page': location.pathname.split('/').pop() || '/' };
-      f.querySelectorAll('input,select,textarea').forEach(c => { if (c.name && c.value) data[c.dataset.label || c.name] = c.value; });
+      const seen = new Set();
+      f.querySelectorAll('input,select,textarea').forEach(c => {
+        if (!c.name || c.disabled || c.closest('.field[hidden]')) return;
+        if (c.type === 'radio' || c.type === 'checkbox') {
+          if (seen.has(c.name)) return; seen.add(c.name);
+          const fl = c.closest('.field'), on = [...f.querySelectorAll('input[name="' + c.name.replace(/"/g, '') + '"]')].filter(x => x.checked && !x.disabled).map(x => x.value);
+          if (on.length) data[(fl && fl.dataset.label) || c.dataset.label || c.name] = on.join(', ');
+          return;
+        }
+        if (c.value) data[c.dataset.label || c.name] = c.value;
+      });
       const em = f.querySelector('input[type=email]'); if (em && em.value) data._replyto = em.value;
       if (btn) { btn.disabled = true; btn.style.opacity = .6; }
       okEl?.classList.remove('show'); failEl?.classList.remove('show');
@@ -210,7 +225,7 @@ async function sendForm(data) {
       catch (err) { failEl?.classList.add('show'); }
       finally { if (btn) { btn.disabled = false; btn.style.opacity = ''; } }
     });
-    f.querySelectorAll('input,select,textarea').forEach(c => c.addEventListener('input', () => c.closest('.field')?.classList.remove('bad')));
+    ['input', 'change'].forEach(ev => f.addEventListener(ev, e => e.target.closest('.field')?.classList.remove('bad')));
   });
 
   // Donate amount picker

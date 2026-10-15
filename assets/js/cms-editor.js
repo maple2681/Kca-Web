@@ -133,7 +133,7 @@
 
   /* ---------- UI ---------- */
   const ui = document.createElement('div'); ui.id = 'kca-admin'; document.body.appendChild(ui);
-  const pageNames = { 'index.html': 'Home', 'about.html': 'About', 'academics.html': 'Academics', 'admissions.html': 'Admissions', 'student-life.html': 'Student Life', 'reviews.html': 'Reviews', 'teaching.html': 'Teaching', 'donate.html': 'Donate', 'contact.html': 'Contact', 'team.html': 'Our Team' };
+  const pageNames = { 'index.html': 'Home', 'about.html': 'About', 'academics.html': 'Academics', 'admissions.html': 'Admissions', 'student-life.html': 'Student Life', 'reviews.html': 'Reviews', 'teaching.html': 'Teaching', 'donate.html': 'Donate', 'contact.html': 'Contact', 'team.html': 'Our Team', 'teacher-application.html': 'Teacher Application' };
   ui.innerHTML = `<div class="bar" role="toolbar" aria-label="Website editor">
       <span class="who"><span class="dot"></span>Editing <small>${user.email} · ${role === 'admin' ? 'Admin' : 'Editor'}</small></span>
       <select aria-label="Go to page">${RT.PAGES.map(p => `<option value="${p}"${p === RT.page ? ' selected' : ''}>${pageNames[p] || p}</option>`).join('')}</select>
@@ -224,9 +224,183 @@
     };
     inp.focus(); load();
   };
+  /* ---------- Form editor: change, hide, reorder and add fields on any form ---------- */
+  const FX = RT.forms;
+  let openForms = () => {};
+  if (FX && FX.list.length) {
+    const fcss = document.createElement('style');
+    fcss.textContent = `
+    html.kca-editing form .field { cursor: pointer; outline: 1.5px dashed transparent; outline-offset: 4px; border-radius: 6px; transition: outline-color .15s; }
+    html.kca-editing form .field:hover { outline-color: rgba(11,116,232,.75); }
+    html.kca-editing form .field.kf-flash { outline: 2px solid #0b74e8; }
+    #kca-admin .fe { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); z-index: 2147483002; display: flex; flex-direction: column; background: #fff; color: #111; box-shadow: -12px 0 40px rgba(0,0,0,.22); font-size: 14px; }
+    #kca-admin .fe header { display: flex; align-items: center; gap: 10px; padding: 16px 18px 10px; }
+    #kca-admin .fe h3 { margin: 0; font-size: 18px; flex: 1; }
+    #kca-admin .fe .x { width: 36px; height: 36px; border: 0; border-radius: 10px; background: #ecebe7; font-size: 20px; cursor: pointer; }
+    #kca-admin .fe .top { padding: 0 18px 10px; border-bottom: 1px solid #ecebe7; }
+    #kca-admin .fe .top p { margin: 6px 0 0; color: #666; font-size: 13px; line-height: 1.45; }
+    #kca-admin .fe select, #kca-admin .fe input[type=text], #kca-admin .fe textarea { width: 100%; height: 38px; border: 2px solid #dcdcd8; border-radius: 10px; padding: 0 10px; font-size: 14px; background: #fff; color: #111; }
+    #kca-admin .fe textarea { height: auto; min-height: 96px; padding: 8px 10px; resize: vertical; line-height: 1.4; }
+    #kca-admin .fe select:focus, #kca-admin .fe input:focus, #kca-admin .fe textarea:focus { outline: none; border-color: #0b74e8; }
+    #kca-admin .fe .body { flex: 1; overflow: auto; padding: 6px 18px 18px; }
+    #kca-admin .fe h4 { margin: 16px 0 6px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #777; }
+    #kca-admin .fe ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid #ecebe7; }
+    #kca-admin .fe li { border-bottom: 1px solid #ecebe7; }
+    #kca-admin .fe li.off .lb { color: #999; text-decoration: line-through; }
+    #kca-admin .fe .rh { display: flex; align-items: center; gap: 6px; padding: 8px 0; }
+    #kca-admin .fe .lb { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+    #kca-admin .fe em { font-style: normal; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: #f1f0ec; color: #555; white-space: nowrap; }
+    #kca-admin .fe em.req { background: #fde8e8; color: #a52a2a; } #kca-admin .fe em.new { background: #e4f0fd; color: #0b5cb8; }
+    #kca-admin .fe button { height: 32px; border: 0; border-radius: 8px; padding: 0 10px; background: #ecebe7; color: #111; font-size: 13px; font-weight: 600; cursor: pointer; }
+    #kca-admin .fe button:hover { background: #dedcd6; }
+    #kca-admin .fe button.primary { background: #0b74e8; color: #fff; } #kca-admin .fe button.danger { background: #fdecea; color: #b3261e; }
+    #kca-admin .fe button:disabled { opacity: .35; cursor: default; }
+    #kca-admin .fe .mv { width: 30px; padding: 0; }
+    #kca-admin .fe .ed { display: grid; gap: 10px; padding: 4px 0 14px; }
+    #kca-admin .fe .ed label { display: grid; gap: 4px; font-size: 12.5px; font-weight: 600; color: #555; }
+    #kca-admin .fe .ed .ck { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #111; font-weight: 500; }
+    #kca-admin .fe .ed .ck input { width: 18px; height: 18px; }
+    #kca-admin .fe .ed small { color: #888; font-weight: 400; }
+    #kca-admin .fe .ed .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+    #kca-admin .fe .add { display: flex; gap: 8px; margin-top: 8px; } #kca-admin .fe .add select { flex: 1; }
+    #kca-admin .fe footer { display: flex; gap: 8px; align-items: center; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid #ecebe7; }
+    #kca-admin .fe footer .sp { flex: 1; } #kca-admin .fe footer button { height: 40px; padding: 0 14px; }
+    #kca-admin .fe .dirty { color: #b26b00; font-size: 12.5px; font-weight: 600; }
+    @media (max-width: 700px) { #kca-admin .fe { top: auto; height: 86vh; border-radius: 20px 20px 0 0; } #kca-admin .fe footer button { flex: 1; } #kca-admin .fe select, #kca-admin .fe input[type=text], #kca-admin .fe textarea { font-size: 16px; } }`;
+    document.head.appendChild(fcss);
+    bar.querySelector('[data-act=msgs]').insertAdjacentHTML('beforebegin', '<button type="button" data-act="forms">Forms</button>');
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const clone = o => JSON.parse(JSON.stringify(o || {}));
+    const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
+    const NEW_TYPES = ['text', 'email', 'tel', 'number', 'date', 'textarea', 'select', 'radio', 'checkbox'];
+    let pane = null, F = null, draft = null, openKey = null, dirty = false;
+
+    const keyOfEl = el => { const r = [...F.fields.values()].find(x => x.el === el); return r ? r.key : el.dataset.kfAdded; };
+    const keysIn = gi => [...F.grids[gi].el.children].filter(n => n.matches('.field') && (n.dataset.kfAdded || [...F.fields.values()].some(r => r.el === n))).map(keyOfEl);
+    const addedDef = k => draft.added.find(d => d.key === k);
+    const elOf = k => (F.fields.get(k) || {}).el || F.form.querySelector(`[data-kf-added="${k}"]`);
+    const infoOf = k => {
+      const r = F.fields.get(k);
+      if (r) return r.info();
+      const d = addedDef(k) || {};
+      return { label: d.label || '', placeholder: d.placeholder || '', help: d.help || '', options: ['select', 'radio', 'checkbox'].includes(d.type) ? (d.options || []) : null, required: !!d.required, full: !!d.full || ['textarea', 'radio', 'checkbox'].includes(d.type), error: d.error || '', hidden: !!d.hidden, kind: d.type, added: true };
+    };
+    const preview = () => { FX.apply(F, draft); };
+    const mark = () => { dirty = true; const n = pane && pane.querySelector('.dirty'); if (n) n.textContent = 'Unsaved changes'; };
+    const change = (k, prop, val) => {
+      const d = addedDef(k);
+      if (d) d[prop] = val; else (draft.fields[k] = draft.fields[k] || {})[prop] = val;
+      preview(); mark(); updateHead(k);
+    };
+    const flash = k => { const el = elOf(k); if (!el || !el.offsetParent) return; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('kf-flash'); setTimeout(() => el.classList.remove('kf-flash'), 1400); };
+
+    function headHTML(k) {
+      const i = infoOf(k);
+      return `<span class="lb" data-open title="${esc(i.label)}">${esc(i.label || 'Untitled')}</span><em>${esc(FX.TYPES[i.kind] || '')}</em>` +
+        (i.added ? '<em class="new">New</em>' : '') + (i.required ? '<em class="req">Required</em>' : '') + (i.hidden ? '<em>Hidden</em>' : '') +
+        `<button type="button" class="mv" data-mv="-1" aria-label="Move up">↑</button><button type="button" class="mv" data-mv="1" aria-label="Move down">↓</button><button type="button" data-open>${openKey === k ? 'Close' : 'Edit'}</button>`;
+    }
+    function updateHead(k) { const li = pane && pane.querySelector(`li[data-k="${CSS.escape(k)}"]`); if (!li) return; li.querySelector('.rh').innerHTML = headHTML(k); li.classList.toggle('off', !!infoOf(k).hidden); fixMoves(); }
+    function fixMoves() { pane.querySelectorAll('ul').forEach(ul => { const lis = [...ul.children]; lis.forEach((li, i) => { li.querySelector('[data-mv="-1"]').disabled = i === 0; li.querySelector('[data-mv="1"]').disabled = i === lis.length - 1; }); }); }
+    function editorHTML(k) {
+      const i = infoOf(k), texty = ['text', 'email', 'tel', 'number', 'url', 'textarea'].includes(i.kind), choice = ['radio', 'checkbox'].includes(i.kind);
+      return `<div class="ed">
+        <label>Question / label<input type="text" data-p="label" value="${esc(i.label)}"></label>
+        <label>Help text <small>(small grey line under the label — optional)</small><input type="text" data-p="help" value="${esc(i.help)}"></label>
+        ${texty ? `<label>Placeholder <small>(example text inside the box — optional)</small><input type="text" data-p="placeholder" value="${esc(i.placeholder)}"></label>` : ''}
+        ${i.options && !i.locked ? `<label>Choices <small>(one per line)</small><textarea data-p="options">${esc(i.options.join('\n'))}</textarea></label>` : ''}
+        ${i.kind === 'special' ? '' : `<label>Error message<input type="text" data-p="error" value="${esc(i.error)}"></label>`}
+        ${i.kind === 'special' || i.locked ? '' : `<label class="ck"><input type="checkbox" data-p="required"${i.required ? ' checked' : ''}> Required (must be filled in)</label>`}
+        ${texty || i.kind === 'select' || i.kind === 'date' ? `<label class="ck"><input type="checkbox" data-p="full"${i.full ? ' checked' : ''}> Full width</label>` : ''}
+        <label class="ck"><input type="checkbox" data-p="hidden"${i.hidden ? ' checked' : ''}> Hide this field from visitors</label>
+        <div class="acts">${i.added ? '<button type="button" class="danger" data-del>Delete field</button>' : '<button type="button" data-reset>Undo changes to this field</button>'}</div>
+      </div>`;
+    }
+    function render() {
+      const saved = FX.saved(F);
+      pane.querySelector('.body').innerHTML = F.grids.map((g, gi) => `<h4>${esc(g.title)}</h4><ul data-g="${gi}">` +
+        keysIn(gi).map(k => `<li data-k="${esc(k)}" class="${infoOf(k).hidden ? 'off' : ''}"><div class="rh">${headHTML(k)}</div>${openKey === k ? editorHTML(k) : ''}</li>`).join('') +
+        `</ul><div class="add"><select aria-label="Type of new field">${NEW_TYPES.map(t => `<option value="${t}">${esc(FX.TYPES[t])}</option>`).join('')}</select><button type="button" data-add="${gi}">+ Add field</button></div>`).join('');
+      pane.querySelector('[data-reset-form]').disabled = !saved && !dirty;
+      fixMoves();
+    }
+    async function close(force) {
+      if (!pane) return;
+      if (dirty && !force) {
+        const c = await ask('Save your form changes?', 'You changed this form but have not saved yet.', [['Discard', 'discard'], ['Keep editing', 'keep'], ['Save', 'save', true]]);
+        if (c === 'keep') return; if (c === 'save') return save(true);
+        FX.apply(F, FX.saved(F));
+      }
+      pane.remove(); pane = null; dirty = false;
+    }
+    async function save(andClose) {
+      const clean = { fields: {}, added: draft.added, order: {} };
+      Object.entries(draft.fields).forEach(([k, o]) => { if (o && Object.keys(o).length) clean.fields[k] = o; });
+      F.grids.forEach((g, gi) => { const ks = keysIn(gi); if (draft.order[gi] || ks.some(k => addedDef(k))) clean.order[gi] = ks; });
+      const empty = !Object.keys(clean.fields).length && !clean.added.length && !Object.keys(clean.order).length;
+      if (await put(F.key, empty ? null : JSON.stringify(clean))) {
+        dirty = false; toast('Form saved — visitors see it now');
+        if (andClose) { pane.remove(); pane = null; } else { pane.querySelector('.dirty').textContent = ''; render(); }
+      }
+    }
+    function pick(f) { F = f; draft = Object.assign({ fields: {}, added: [], order: {} }, clone(FX.saved(F))); dirty = false; render(); }
+
+    openForms = async (f, key) => {
+      if (pane && f !== F) { await close(); if (pane) return; }
+      if (!pane) {
+        pane = document.createElement('div'); pane.className = 'fe'; pane.setAttribute('role', 'dialog'); pane.setAttribute('aria-label', 'Form editor');
+        pane.innerHTML = `<header><h3>Form editor</h3><button type="button" class="x" aria-label="Close">×</button></header>
+          <div class="top">${FX.list.length > 1 ? `<select aria-label="Which form">${FX.list.map((x, i) => `<option value="${i}">${esc(x.name)}</option>`).join('')}</select>` : `<strong></strong>`}
+          <p>Edit questions, choices and required fields, hide or reorder them, or add new ones. You see changes on the page right away; press <b>Save</b> to publish them.</p></div>
+          <div class="body"></div>
+          <footer><button type="button" data-reset-form>Reset form</button><span class="sp dirty"></span><button type="button" data-discard>Discard</button><button type="button" class="primary" data-save>Save</button></footer>`;
+        ui.appendChild(pane);
+        const sel = pane.querySelector('.top select');
+        if (sel) sel.onchange = async () => { const nf = FX.list[+sel.value]; if (dirty) { const c = await ask('Save your form changes?', 'You changed this form but have not saved yet.', [['Discard', 'discard'], ['Save', 'save', true]]); if (c === 'save') await save(); else FX.apply(F, FX.saved(F)); } openKey = null; pick(nf); };
+        pane.querySelector('.x').onclick = () => close();
+        pane.querySelector('[data-discard]').onclick = () => { FX.apply(F, FX.saved(F)); openKey = null; pick(F); pane.querySelector('.dirty').textContent = ''; toast('Changes discarded'); };
+        pane.querySelector('[data-save]').onclick = () => save();
+        pane.querySelector('[data-reset-form]').onclick = async () => {
+          if (!(await ask('Reset this form?', 'All changes to this form (including new fields) will be removed and it goes back to the original.', [['Cancel', false], ['Reset', true, true]]))) return;
+          draft = { fields: {}, added: [], order: {} }; preview(); openKey = null; await save(); render();
+        };
+        const body = pane.querySelector('.body');
+        body.addEventListener('click', e => {
+          const li = e.target.closest('li[data-k]'), k = li && li.dataset.k;
+          if (e.target.closest('[data-open]') && k) { openKey = openKey === k ? null : k; render(); if (openKey) { flash(k); pane.querySelector(`li[data-k="${CSS.escape(k)}"] input[data-p=label]`)?.focus(); } return; }
+          const mv = e.target.closest('[data-mv]');
+          if (mv && k) { const gi = +li.parentElement.dataset.g, ks = keysIn(gi), i = ks.indexOf(k), j = i + +mv.dataset.mv; if (j < 0 || j >= ks.length) return; [ks[i], ks[j]] = [ks[j], ks[i]]; draft.order[gi] = ks; preview(); mark(); render(); flash(k); return; }
+          if (e.target.closest('[data-reset]') && k) { delete draft.fields[k]; preview(); mark(); render(); return; }
+          if (e.target.closest('[data-del]') && k) { draft.added = draft.added.filter(d => d.key !== k); Object.values(draft.order).forEach(a => { const x = a.indexOf(k); if (x > -1) a.splice(x, 1); }); openKey = null; preview(); mark(); render(); return; }
+          const add = e.target.closest('[data-add]');
+          if (add) {
+            const gi = +add.dataset.add, type = add.previousElementSibling.value, k = 'n' + Date.now().toString(36);
+            const choice = ['select', 'radio', 'checkbox'].includes(type);
+            draft.added.push({ key: k, grid: gi, type, label: 'New question', options: choice ? ['Option 1', 'Option 2'] : undefined, required: false, full: type === 'textarea' });
+            draft.order[gi] = keysIn(gi).concat(k); openKey = k; preview(); mark(); render(); flash(k);
+            const inp = pane.querySelector(`li[data-k="${k}"] input[data-p=label]`); if (inp) { inp.focus(); inp.select(); }
+          }
+        });
+        const onEdit = e => {
+          const p = e.target.dataset.p, li = e.target.closest('li[data-k]'); if (!p || !li) return;
+          const v = e.target.type === 'checkbox' ? e.target.checked : p === 'options' ? lines(e.target.value) : e.target.value;
+          if (p === 'options' && !v.length) return;
+          if (p === 'label' && !String(v).trim()) return;
+          change(li.dataset.k, p, v);
+        };
+        body.addEventListener('input', onEdit); body.addEventListener('change', e => { if (e.target.type === 'checkbox') onEdit(e); });
+      }
+      if (f !== F || !draft) pick(f);
+      const sel = pane.querySelector('.top select'); if (sel) sel.value = FX.list.indexOf(F); else pane.querySelector('.top strong').textContent = F.name;
+      if (key) { openKey = key; render(); flash(key); pane.querySelector(`li[data-k="${CSS.escape(key)}"]`)?.scrollIntoView({ block: 'nearest' }); }
+    };
+    bar.querySelector('[data-act=forms]').onclick = () => (pane ? close() : openForms(F || FX.list[0]));
+  }
+
   bar.querySelector('[data-act=out]').onclick = async () => { exitEdit(); await backend.signOut().catch(() => {}); location.reload(); };
 
-  RT.U.forEach(u => u.el.setAttribute('data-kca-unit', ''));
+  // text inside form fields is edited in the Form editor instead
+  RT.U.forEach(u => { if (!(RT.forms && RT.forms.fieldOf(u.el))) u.el.setAttribute('data-kca-unit', ''); });
   document.querySelectorAll('details').forEach(d => d.open = true);
   setMode(true);
 
@@ -466,6 +640,8 @@
   document.addEventListener('click', e => {
     if (cur && !cur.el.contains(e.target) && !(chip && chip.contains(e.target))) finish();
     if (!editing || e.target.closest('#kca-admin')) return;
+    const ff = RT.forms && RT.forms.fieldOf(e.target);
+    if (ff) { e.preventDefault(); e.stopPropagation(); finish(); openForms(ff.F, ff.key); return; }
     const unit = e.target.closest('[data-kca-unit]');
     if (unit) { e.preventDefault(); e.stopPropagation(); start(unit, e.clientX, e.clientY); return; }
     const img = imgAt(e.clientX, e.clientY);
@@ -486,5 +662,5 @@
   }, { passive: true });
   addEventListener('scroll', () => { if (cur) placeChip(cur.u); }, { passive: true });
 
-  toast('Edit mode: click any text or photo');
+  toast(RT.forms && RT.forms.list.length ? 'Edit mode: click any text, photo or form field' : 'Edit mode: click any text or photo');
 })();

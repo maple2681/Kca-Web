@@ -5,7 +5,7 @@
    rules in supabase/setup.sql are what protect your content.)
    ============================================================ */
 window.KCA_CMS = {
-  supabaseUrl: 'https://ludagoefybarccnkqdjf.supabase.co',      // e.g. 'https://abcdxyz.supabase.co'
-  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZGFnb2VmeWJhcmNjbmtxZGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNDU3NTQsImV4cCI6MjEwNTgyMTc1NH0.AAaVJbRrOwMddgn2LkTWogdt9a5ifyOPLxR_mM2Y7k4',    // e.g. 'eyJhbGciOi...'
+  supabaseUrl: 'https://llxceawtuhbinpdgklog.supabase.co',      // e.g. 'https://abcdxyz.supabase.co'
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseGNlYXd0dWhiaW5wZGdrbG9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExODYzMjksImV4cCI6MjEwNjc2MjMyOX0.GUj81eioWh-mLIAy6WGH9__z956F8iFJvQFc75YyEbs',    // e.g. 'eyJhbGciOi...'
   allowedDomain: 'kca.org.ua'
 };
